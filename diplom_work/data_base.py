@@ -26,8 +26,7 @@ def add_id_users(profile_id, worksheet_id):
     engine = create_engine(db_url_object)
     Base.metadata.create_all(engine)
     with Session(engine) as session:
-        to_bd = Viewed(profile_id=profile_id, worksheet_id=\
-        worksheet_id)
+        to_bd = Viewed(profile_id=profile_id, worksheet_id=worksheet_id)
         session.add(to_bd)
         session.commit()
 
@@ -36,8 +35,7 @@ def add_id_users_elect(profile_id, worksheet_id):
     engine = create_engine(db_url_object)
     Base.metadata.create_all(engine)
     with Session(engine) as session:
-        to_bd = elect(profile_id=profile_id, worksheet_id=\
-        worksheet_id)
+        to_bd = elect(profile_id=profile_id, worksheet_id=worksheet_id)
         session.add(to_bd)
         session.commit()
 
@@ -46,8 +44,8 @@ def get_id_users(profile_id):
     engine = create_engine(db_url_object)
     list_id = []
     with Session(engine) as session:
-        from_bd = session.query(Viewed).filter(Viewed.profile_id\
-        ==profile_id).all()
+        from_bd = session.query(Viewed).filter(
+            Viewed.profile_id == profile_id).all()
         for item in from_bd:
             list_id.append(item.worksheet_id)
     return list_id
@@ -57,8 +55,8 @@ def get_id_users_elect(profile_id=None):
     engine = create_engine(db_url_object)
     list_id = []
     with Session(engine) as session:
-        from_bd = session.query(elect).filter(elect.profile_id\
-        ==profile_id).all()
+        from_bd = session.query(elect).filter(
+            elect.profile_id == profile_id).all()
         for item in from_bd:
             list_id.append(item.worksheet_id)
     return list_id
@@ -68,7 +66,5 @@ def create_tables(engine):
     Base.metadata.create_all(engine)
 
 
-if __name__ == '__main__':
-    create_tables(engine)
-    
+
     
