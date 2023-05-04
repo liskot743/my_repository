@@ -15,7 +15,12 @@ class BotInterface():
         self.params = None
         self.offset = 0
 
-    def message_send(self, user_id, message=None, attachment=None, keyboard=None, sticker_id=None):
+    def message_send(self,
+                     user_id,
+                     message=None,
+                     attachment=None,
+                     keyboard=None,
+                     sticker_id=None):
         self.interface.method(
             'messages.send', {
                 'user_id': user_id,
@@ -90,7 +95,6 @@ class BotInterface():
                             users = self.api.search_users(
                                 self.params, self.offset)
                             list_id_users = get_id_users(event.user_id)
-                            self.offset += 100
                             self.message_send(
                                 event.user_id,
                                 f'Анкеты найдены 🔥, для просмотра нажимай Далее 💫'
@@ -121,13 +125,33 @@ class BotInterface():
                                               keyboard=self.api.keyboard())
 
                             add_id_users(event.user_id, user['id'])
-                            self.offset += 10
 
                     except IndexError:
-                        self.message_send(event.user_id, f'Нажмите поиск')
+                        self.offset += 100
+                        users = self.api.search_users(self.params, self.offset)
+                        list_id_users = get_id_users(event.user_id)
+                        user = users.pop()
+
+                        if user['id'] not in list_id_users:
+                            photos_user = self.api.get_photos(user['id'])
+                            attachment = ""
+
+                            for num, photo in enumerate(photos_user):
+                                attachment += f'photo{photo["owner_id"]}_\
+{photo["id"]},'
+
+                                if num == 2:
+                                    break
+
+                            self.message_send(event.user_id,
+                                              f"""{user["name"]}
+                                        vk.com/id{user["id"]}""",
+                                              attachment=attachment,
+                                              keyboard=self.api.keyboard())
+
+                            add_id_users(event.user_id, user['id'])
+
                     except UnboundLocalError:
-                        self.message_send(event.user_id, f'Нажмите поиск')
-                    except TypeError:
                         self.message_send(event.user_id, f'Нажмите поиск')
 
                 elif command == 'в избранное ❤':
@@ -184,14 +208,12 @@ class BotInterface():
                     self.message_send(
                         event.user_id,
                         f"""Привет, {self.params["name"]} 😊, я бот VKinder \
-для знакомств, нажми на кнопку Поиск, чтобы найти подходящие для тебя анкеты \   71117
+для знакомств, нажми на кнопку Поиск, чтобы найти подходящие для тебя анкеты \
 😎""",
                         keyboard=self.api.keyboard())
-             
-                elif command == 'пока':                 
-                    self.message_send(
-                        event.user_id,
-                        sticker_id = 71117)
+
+                elif command == 'пока':
+                    self.message_send(event.user_id, sticker_id=71117)
 
                 else:
                     self.message_send(event.user_id, 'команда не опознана 😐')
@@ -201,5 +223,5 @@ if __name__ == '__main__':
     bot = BotInterface(comunity_token, access_token)
     bot.event_handler()
 
-    
+            
             
